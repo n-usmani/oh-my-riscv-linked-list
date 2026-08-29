@@ -23,6 +23,18 @@ newline:     .asciz "\n"
 msg_value:   .asciz "new_node value field"
 msg_next:    .asciz "new_node next field"
 
+# ============================================================
+# ADD THESE STRINGS to your .data section:
+# ============================================================
+msg_zero_val:    .asciz "new_node(0) value field"
+msg_zero_next:   .asciz "new_node(0) next field"
+msg_neg_val:     .asciz "new_node(-1) value field"
+msg_neg_next:    .asciz "new_node(-1) next field"
+msg_max_val:     .asciz "new_node(max int) value field"
+msg_n1_val:      .asciz "node1 value field (after node2 exists)"
+msg_n2_val:      .asciz "node2 value field"
+msg_addr_diff:   .asciz "node1 and node2 have different addresses"
+
 .text
 
 # ------------------------------------------------------------
@@ -68,9 +80,70 @@ main:
     check_word (t0, 0, 5, msg_value)
     check_word (t0, 4, 0, msg_next)
     
-    # testing if print even works
-    li a7, 4
-    la a0, pass_str
+    
+    # ============================================================
+# ADD THESE TEST CALLS into main, after your existing tests:
+# ============================================================
+ 
+    # ---- Test: new_node(0) ----
+    # Edge case: does storing 0 work the same as any other value,
+    # or does something (incorrectly) treat 0 as a special/null case?
+    li   a0, 0
+    jal  ra, new_node
+    mv   t1, a0
+    check_word (t1, 0, 0, msg_zero_val)
+    check_word (t1, 4, 0, msg_zero_next)
+ 
+    # ---- Test: new_node(-1) ----
+    # Edge case: negative values. Confirms the value field isn't
+    # accidentally treated as unsigned somewhere in storage/retrieval.
+    li   a0, -1
+    jal  ra, new_node
+    mv   t1, a0
+    check_word (t1, 0, -1, msg_neg_val)
+    check_word (t1, 4, 0, msg_neg_next)
+ 
+    # ---- Test: new_node(largest 32-bit int) ----
+    # Edge case: a value near the boundary of what a word can hold.
+    li   a0, 2147483647
+    jal  ra, new_node
+    mv   t1, a0
+    check_word (t1, 0, 2147483647, msg_max_val)
+ 
+    # ---- Test: two nodes allocated back-to-back don't clobber each other ----
+    # This is the most important edge case for new_node specifically:
+    # does calling it twice in a row give two independent, correctly
+    # separated pieces of memory, or does the second call overwrite
+    # data the first call already wrote?
+    li   a0, 111
+    jal  ra, new_node
+    mv   t1, a0             # t1 = node1's address
+ 
+    li   a0, 222
+    jal  ra, new_node
+    mv   t2, a0             # t2 = node2's address
+ 
+    check_word (t1, 0, 111, msg_n1_val)   # node1 should be untouched
+    check_word (t2, 0, 222, msg_n2_val)   # node2 should hold its own value
+ 
+    # Confirms the two addresses aren't the same memory (a real bug
+    # would be sbrk returning the same address twice, silently
+    # overwriting node1 when node2 is created)
+    beq  t1, t2, addr_fail
+    la   a0, pass_str
+    li   a7, 4
+    ecall
+    j    addr_done
+addr_fail:
+    la   a0, fail_str
+    li   a7, 4
+    ecall
+addr_done:
+    la   a0, msg_addr_diff
+    li   a7, 4
+    ecall
+    la   a0, newline
+    li   a7, 4
     ecall
 
     # exit cleanly:
