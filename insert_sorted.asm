@@ -98,6 +98,54 @@ node8a: .word 4
         .word 0
 newnode8: .word 4
           .word 0
+        
+# THIRD ROUND OF TESTING:  
+msg9: .asciz "\nTest 9 (3 sequential inserts) expect '5 10 20 30 40': "
+head9: .word node9a
+node9a: .word 10
+        .word node9b
+node9b: .word 30
+        .word 0
+newnode9a: .word 20
+           .word 0
+newnode9b: .word 5
+           .word 0
+newnode9c: .word 40
+           .word 0
+ 
+msg10: .asciz "\nTest 10 (max int into large-value list) expect '100 2000000000 2147483647': "
+head10: .word node10a
+node10a: .word 100
+         .word node10b
+node10b: .word 2000000000
+         .word 0
+newnode10: .word 2147483647
+           .word 0
+ 
+msg11: .asciz "\nTest 11 (insert into 10-node list) expect '1 3 5 7 9 10 11 13 15 17 19': "
+head11: .word node11a
+node11a: .word 1
+         .word node11b
+node11b: .word 3
+         .word node11c
+node11c: .word 5
+         .word node11d
+node11d: .word 7
+         .word node11e
+node11e: .word 9
+         .word node11f
+node11f: .word 11
+         .word node11g
+node11g: .word 13
+         .word node11h
+node11h: .word 15
+         .word node11i
+node11i: .word 17
+         .word node11j
+node11j: .word 19
+         .word 0
+newnode11: .word 10
+           .word 0
 
 
 .text
@@ -185,6 +233,42 @@ main:
     li   a0, '\n'
     li   a7, 11
     ecall
+    
+        # ---- Test 9: three sequential inserts, each building on the last ----
+    la   a0, msg9
+    li   a7, 4
+    ecall
+    la   a0, newnode9a
+    la   a1, head9
+    jal  ra, insert_sorted   # list: 10 20 30
+    la   a0, newnode9b
+    la   a1, head9
+    jal  ra, insert_sorted   # list: 5 10 20 30
+    la   a0, newnode9c
+    la   a1, head9
+    jal  ra, insert_sorted   # list: 5 10 20 30 40
+    lw   a0, head9
+    jal  ra, print_list
+ 
+    # ---- Test 10: max int value ----
+    la   a0, msg10
+    li   a7, 4
+    ecall
+    la   a0, newnode10
+    la   a1, head10
+    jal  ra, insert_sorted
+    lw   a0, head10
+    jal  ra, print_list
+ 
+    # ---- Test 11: insert into a 10-node list ----
+    la   a0, msg11
+    li   a7, 4
+    ecall
+    la   a0, newnode11
+    la   a1, head11
+    jal  ra, insert_sorted
+    lw   a0, head11
+    jal  ra, print_list
 
     li   a7, 10
     ecall
