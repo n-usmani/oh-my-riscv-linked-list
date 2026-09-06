@@ -49,19 +49,21 @@ Node* merge_linked_lists(Node *a, Node *b) {
         return a;
     }
 
-    Node *current = b;
-    Node *temp = NULL;
+    Node *current = b; // to iterate over list B
+    Node *temp = NULL; // for use in 
 
     while (1) {
         if (current == NULL) { break; }
 
         temp = current->next;
-        insert_sorted(current, &a);
-        current = temp;
+        // ^^save the next node in list B to continue
+        insert_sorted(current, &a); // insert the node!
+        current = temp; // set up for next iteration
+                        //    of loop.
 
     }
 
-    return a;
+    return a; // either way, return value is list A.
 }
 
 // THIS FUNCTION WAS WRITTEN BY CLAUDE FOR TESTING:
@@ -75,6 +77,8 @@ int list_equals(Node *head, int *expected, int count) {
     return current == NULL;                       // list too long?
 }
 
+// =========================================================
+// =========================================================
 
 int main() { // tests will go here
     // TEST SUITE WRITTEN BY CLAUDE
