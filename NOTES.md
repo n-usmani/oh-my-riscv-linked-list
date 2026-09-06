@@ -41,3 +41,16 @@
             ```Test 9 (3 sequential inserts) expect '5 10 20 30 40': 5 10 20 30 40 
             Test 10 (max int into large-value list) expect '100 2000000000 2147483647': 100 2000000000 2147483647 
             Test 11 (insert into 10-node list) expect '1 3 5 7 9 10 11 13 15 17 19': 1 3 5 7 9 10 11 13 15 17 19```
+
+    - merge_linked_lists.asm
+        - 10-test suite passed. Results:
+        ```Test A (build via repeated insert_sorted) expect '1 3 5 8': 1 3 5 8 
+            Test B (merge into empty A) expect '10 20': 10 20 
+            Test C (merge empty B into A) expect '7 9': 7 9 
+            Test D (duplicates across both lists) expect '3 3 3 3': 3 3 3 3 
+            Test E (negative values via insert_sorted) expect '-5 -3 -1': -5 -3 -1 
+            Test F (10-node list via sequential inserts) expect '1 2 3 4 5 6 7 8 9 10': 1 2 3 4 5 6 7 8 9 10 
+            Test G (merge where B's min < A's head) expect '0 1 2': 0 1 2 
+            Test H (min/max int range across merge) expect small-to-large sorted: -2147483648 0 2147483647 
+            Test I (three-way chained merge A+B, then +C) expect '1 2 3 4 5 6': 1 2 3 4 5 6 
+            Test J (two single-node lists merged) expect '4 9': 4 9 ```

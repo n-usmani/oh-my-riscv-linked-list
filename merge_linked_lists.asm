@@ -68,8 +68,7 @@ merge_linked_lists:
 	return_B:
 		beqz a1, return_A # if list B NULL, branch to return_A
 		
-		lw s3, 0(a1) # load address of list B's first node
-		sw s3, 0(a0) # list A head now points to list B first item.
+		sw a1, 0(a0) # list A head now points to list B first item.
 	
 	return_A:
 		lw ra, 16(sp)
