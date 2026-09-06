@@ -22,6 +22,7 @@
 # t4 = temp register for updating pointer_to_update [t1] 
 # t5 = the pointer stored at pointer_to_update's value
 
+.globl insert_sorted
 
 insert_sorted:
 	lw t0, 0(a0) # target = node->value

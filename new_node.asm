@@ -10,6 +10,8 @@
 # Returns: a0 = pointer to new node
 # ============================================================
 
+.globl new_node
+
 new_node:
 	mv t0, a0
 	

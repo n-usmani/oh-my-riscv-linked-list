@@ -9,6 +9,8 @@
 # Returns: (none)
 # ============================================================
 
+.globl print_list
+
 print_list:
 	mv t0, a0
 	

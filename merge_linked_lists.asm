@@ -20,6 +20,8 @@
 # s2 = temp ( )
 # s3 = address of list B first node (*)
 
+.globl merge_linked_lists
+
 merge_linked_lists:
 	# save 4 registers values (i am a callee at present.) ~~~
 	addi sp, sp, -20
