@@ -1,7 +1,7 @@
 # RISC-V Linked List
 
-A singly linked list implemented in RISC-V assembly (RARS). A fully-working implementation of 
-the whole module was first written and tested in C; then I wrote each one in assembly.
+A singly linked list implemented in RISC-V assembly (RARS). A working implementation of 
+the module was first written and tested in C; then I wrote each one in assembly.
 
 ## Functions
 
@@ -16,7 +16,7 @@ the whole module was first written and tested in C; then I wrote each one in ass
 
 1. Open all `.asm` files in RARS.
 2. In Settings, enable **Assemble all files currently open**.
-3. Assemble, then run `main.asm` (or your own file).
+3. Assemble, then run `main.asm` (or your own driver file).
 
 ## Testing
 
@@ -26,11 +26,11 @@ the whole module was first written and tested in C; then I wrote each one in ass
 ## Merging a List with Itself
 
 - When you try to merge a list with itself, it results in an infinite loop! No crashes or bugs, though.
-- This is not currently guarded against, so beware this case.
+- This is not currently guarded against, so beware of this case.
 
 ## C reference
 
-- `linked_list.c` is the original C implementation (written by me).
+- `linked_list.c` is my original C implementation.
 - This was used to thoroughly test the algorithm before implementing it in assembly.
 
 ## Development Notes / AI Usage
@@ -44,4 +44,4 @@ the whole module was first written and tested in C; then I wrote each one in ass
     - Most tests were decided by me; I suggested several of them to target iffy edge cases
   - Finding bugs
   - Brainstorming fixes for bugs >> I made decisions based on my mental spec and my C implementation
-- **`NOTES.md** documents many of the decisions, bugs, and testing sessions
+- **`NOTES.md`** documents many of the decisions, bugs, and testing sessions
