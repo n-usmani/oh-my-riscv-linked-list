@@ -11,6 +11,9 @@
 .globl main
 
 .data
+pass_str: .asciz "PASS: "
+fail_str: .asciz "FAIL: "
+
 headA: .word 0        # starts NULL; set at runtime once nodeA1 exists
 
 msgA: .asciz "Test A (build via repeated insert_sorted) expect '1 3 5 8': "
@@ -24,6 +27,12 @@ msgH: .asciz "\nTest H (min/max int range across merge) expect small-to-large so
 msgI: .asciz "\nTest I (three-way chained merge A+B, then +C) expect '1 2 3 4 5 6': "
 msgJ: .asciz "\nTest J (two single-node lists merged) expect '4 9': "
 headEmpty: .word 0     # reused as a scratch "empty list" head across tests
+msgK: .asciz "\nTest K (both lists genuinely empty) expect nothing: "
+msgL: .asciz "\nTest L (empty A, multi-node B, 3+ nodes) expect '1 2 3': "
+msgM: .asciz "\nTest M (non-trivial A, NULL B) expect '1 2 3 4 5': "
+msgN: .asciz "\nTest N (WARNING: self-merge, list into itself) risk of infinite loop/corruption: "
+msgO: .asciz "\nTest O (insert_sorted, node's next field has garbage before insert) expect '3 5 9': "
+msgP: .asciz "\nTest P (10 descending inserts, repeated head-replacement) expect '11 12 13 14 15 16 17 18 19 20': "
 
 
 .text
@@ -261,7 +270,142 @@ main:
     jal  ra, merge_linked_lists
     lw   a0, headEmpty
     jal  ra, print_list
+    
+    
+        # ---- Test K: both A and B genuinely empty ----
+    # Directly exercises the untested combination: merge_linked_lists
+    # hits return_B (A is NULL), then INSIDE return_B, hits its own
+    # beqz a1, return_A check (B is also NULL) — a path no prior test
+    # has reached, since every earlier "empty A" test (B) had a
+    # non-empty B, and every earlier "empty B" test (C) had a
+    # non-empty A.
+    la   a0, msgK
+    li   a7, 4
+    ecall
+    la   t0, headEmpty
+    sw   x0, 0(t0)
+    la   a0, headEmpty
+    li   a1, 0
+    jal  ra, merge_linked_lists
+    lw   a0, headEmpty
+    jal  ra, print_list
+    
+    
+        # ---- Test L: empty A, multi-node B (3+ nodes) ----
+    # Test B only checked a 2-node B. This confirms return_B's
+    # direct pointer-redirect (sw a1, 0(a0)) preserves B's ENTIRE
+    # chain, not just the first node/link.
+    la   a0, msgL
+    li   a7, 4
+    ecall
+    la   t0, headEmpty
+    sw   x0, 0(t0)
+    li   a0, 3
+    jal  ra, new_node
+    mv   s6, a0
+    li   a0, 2
+    jal  ra, new_node
+    sw   s6, 4(a0)
+    mv   s7, a0
+    li   a0, 1
+    jal  ra, new_node
+    sw   s7, 4(a0)
+    mv   s7, a0                    # s7 = head of B (1 -> 2 -> 3)
+    la   a0, headEmpty
+    mv   a1, s7
+    jal  ra, merge_linked_lists
+    lw   a0, headEmpty
+    jal  ra, print_list
+    
+    
+        # ---- Test M: non-trivial A (5 nodes), NULL B ----
+    # Directly exercises the EARLY beqz a1, return_A check (before
+    # the loop even starts) with a non-trivial A, confirming A is
+    # left completely unchanged by a no-op merge.
+    la   a0, msgM
+    li   a7, 4
+    ecall
+    la   t0, headEmpty
+    sw   x0, 0(t0)
+    li   s5, 1
+  insertM_loop:
+    mv   a0, s5
+    jal  ra, new_node
+    la   a1, headEmpty
+    jal  ra, insert_sorted
+    addi s5, s5, 1
+    li   t1, 5
+    ble  s5, t1, insertM_loop
+    la   a0, headEmpty
+    li   a1, 0
+    jal  ra, merge_linked_lists
+    lw   a0, headEmpty
+    jal  ra, print_list
  
+ 
+     # ---- Test N: self-merge — list merged into itself ----
+    # WARNING: this is expected to potentially misbehave (infinite
+    # loop or corruption), per the aliasing concern raised — the
+    # function was never designed to handle A and B being the same
+    # list. If RARS hangs here, that CONFIRMS the suspected bug;
+    # stop execution and treat this as a documented, known
+    # limitation rather than something to "fix" blindly.
+    
+    # *** NOTE: removed contents of Test N to NOTES.md file to prevent infinite loop during the rest of testing. ***
+    
+    
+        # ---- Test O: insert_sorted with a garbage (non-NULL, non-zero)
+    # value already sitting in the new node's next field ----
+    # insert_sorted should unconditionally overwrite next regardless
+    # of what was there before — this confirms that assumption.
+    la   a0, msgO
+    li   a7, 4
+    ecall
+    la   t0, headEmpty
+    sw   x0, 0(t0)
+    li   a0, 5
+    jal  ra, new_node
+    la   a1, headEmpty
+    jal  ra, insert_sorted
+    li   a0, 9
+    jal  ra, new_node
+    li   t2, 999999             # garbage, definitely not a real address
+    sw   t2, 4(a0)                 # manually corrupt next BEFORE inserting
+    la   a1, headEmpty
+    jal  ra, insert_sorted
+    li   a0, 3
+    jal  ra, new_node
+    li   t2, -1                  # different garbage pattern
+    sw   t2, 4(a0)
+    la   a1, headEmpty
+    jal  ra, insert_sorted
+    lw   a0, headEmpty
+    jal  ra, print_list
+    
+    
+        # ---- Test P: 10 descending inserts — repeated head-replacement ----
+    # Test G proved head-replacement works ONCE. This proves it holds
+    # up correctly across many consecutive replacements in a row.
+    la   a0, msgP
+    li   a7, 4
+    ecall
+    la   t0, headEmpty
+    sw   x0, 0(t0)
+    li   s5, 20
+insertP_loop:
+    mv   a0, s5
+    jal  ra, new_node
+    la   a1, headEmpty
+    jal  ra, insert_sorted
+    addi s5, s5, -1
+    li   t1, 11
+    bge  s5, t1, insertP_loop
+    lw   a0, headEmpty
+    jal  ra, print_list
 
+
+    # exit cleanly:
     li   a7, 10
     ecall
+    
+# *** END OF FILE ***

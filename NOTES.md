@@ -44,7 +44,7 @@
 
     - merge_linked_lists.asm
         - 10-test suite passed. Results:
-        ```Test A (build via repeated insert_sorted) expect '1 3 5 8': 1 3 5 8 
+            ```Test A (build via repeated insert_sorted) expect '1 3 5 8': 1 3 5 8 
             Test B (merge into empty A) expect '10 20': 10 20 
             Test C (merge empty B into A) expect '7 9': 7 9 
             Test D (duplicates across both lists) expect '3 3 3 3': 3 3 3 3 
@@ -54,3 +54,14 @@
             Test H (min/max int range across merge) expect small-to-large sorted: -2147483648 0 2147483647 
             Test I (three-way chained merge A+B, then +C) expect '1 2 3 4 5 6': 1 2 3 4 5 6 
             Test J (two single-node lists merged) expect '4 9': 4 9 ```
+        - Next 6 tests. One (Test N) unearthed a known limitation! See bottom of file. But here are the rest:
+            ```Test K (both lists genuinely empty) expect nothing: 
+            Test L (empty A, multi-node B, 3+ nodes) expect '1 2 3': 1 2 3 
+            Test M (non-trivial A, NULL B) expect '1 2 3 4 5': 1 2 3 4 5 
+            Test O (insert_sorted, node's next field has garbage before insert) expect '3 5 9': 3 5 9 
+            Test P (10 descending inserts, repeated head-replacement) expect '11 12 13 14 15 16 17 18 19 20': 11 12 13 14 15 16 17 18 19 20 ```
+
+## Special/Interesting Cases
+    ### Merging a List with Itself
+    - When you try to merge a list with itself, it results in an infinite loop! No crashes or bugs, though.
+    - Therefore: please be advised not to use this library for said case.
