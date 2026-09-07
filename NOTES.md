@@ -43,6 +43,12 @@
             Test 11 (insert into 10-node list) expect '1 3 5 7 9 10 11 13 15 17 19': 1 3 5 7 9 10 11 13 15 17 19```
 
     - merge_linked_lists.asm
+        - [Note added later] Tried 10-test suite: Test B not only failed, but crashed the program
+            - Error message: `Error in print_list.asm line 22: Runtime exception at 0x004001c0: Load address not aligned to word boundary 0x0000000a`
+            - This was due to a one-step-too-far dereference of List B's head pointer in the return_B case
+               in `merge_linked_lists.asm` (used when list A is empty but list B is not)
+            - Used the register itself instead of going TO the address stored in the register and it started 
+              working smoothly as you can see below ↓ ↓ ↓
         - 10-test suite passed. Results:
             ```Test A (build via repeated insert_sorted) expect '1 3 5 8': 1 3 5 8 
             Test B (merge into empty A) expect '10 20': 10 20 
