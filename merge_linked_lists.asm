@@ -19,6 +19,7 @@
 # s1 = current (*)
 # s2 = temp ( )
 # s3 = address of list B first node (*)
+# ============================
 
 .globl merge_linked_lists
 
