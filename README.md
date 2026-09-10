@@ -25,8 +25,8 @@ the module was first written and tested in C; then I wrote each one in assembly.
 
 ## Merging a List with Itself
 
-- When you try to merge a list with itself, it results in an infinite loop! No crashes or bugs, though.
-- This is not currently guarded against, so beware of this case.
+- When you try to merge a list with itself, it results in an infinite loop. No crashes or bugs.
+- This is not currently guarded against.
 
 ## C reference
 
